@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<!--  <div style="text-align : center">-->
+    <h1>Login</h1>
+    {% if errore %}
+    <div class="alert alert-warning" role="alert">
+      Username o password errati
+    </div>
+    {% endif %}
+    <form method="post">
+        <label for="username">User</label> <br>
+        <input type="text" required id="username" name="username"><br><br>
+        <label for="password">Password</label><br>
+        <input type="password" required id="password" name="password"> <br><br>
+        <input type="submit" class="btn btn-outline-primary" value="Accedi">
+    </form>
+<!--  </div>-->
+{% endblock %}

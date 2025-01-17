@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{{ url_for('static', filename='bootstrap.css') }}" rel="stylesheet">
+  <title>{% block title %}Movie tracker{% endblock %}</title>
+</head>
+<body>
+  <nav class="navbar sticky-top navbar-expand-lg" data-bs-theme="dark" style="background-color: #5D8736;">
+    <div class="container-xxl">
+      <a class="navbar-brand">Movie Tracker</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.path == '/movies' %}active{% endif %}" href="{{ url_for('movies') }}">Movies</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          {% if session.get('username') %}
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active">{{ session.get('username') }}</a>
+            </li>
+            <li class="nav-item">
+             <a class="btn btn-outline-light" href="{{ url_for('logout') }}">Logout</a>
+            </li>
+          </ul>
+          {% else %}
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="{{ url_for('login') }}">Login</a>
+            </li>
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+
+  <div class="container-xxl bd-gutter mt-3 my-md-4 bd-layout">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <script src="{{ url_for('static', filename='bootstrap.bundle.js') }}"></script>
+</body>
+</html>

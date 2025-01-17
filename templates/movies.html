@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Movies{% endblock %}
+
+{% block content %}
+<h3 class="d-flex justify-content-center mb-3">Add a new movie</h3>
+<form method="post" class="d-flex justify-content-center mb-3">
+  <div class="input-group mb-3" style="max-width: 500px; width: 100%;">
+    <input type="text" class="form-control" placeholder="Title" value="{{ searched_text}}"
+           name="search" aria-describedby="button-addon2">
+    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
+  </div>
+</form>
+
+{% if results %}
+  <!-- First 3 Results as Small Horizontal Cards -->
+  <div class="row g-3 mb-3 row-cols-2 row-cols-lg-4">
+    {% for movie in results[:4] %}
+    <div class="col">
+      <div class="card flex-row">
+        <img src="https://image.tmdb.org/t/p/w200/{{ movie.poster_path }}"
+             class="card-img-left"
+             alt="Poster for {{ movie.title }}"
+             style="width: 100px; height: 150px; object-fit: cover;"
+             onerror="this.onerror=null; this.src='{{ url_for('static', filename='N-A_50x75.png') }}'">
+        <div class="card-body">
+          <h6 class="card-title mb-1">{{ movie.title }}</h6>
+          <p class="card-text text-muted mb-2" style="font-size: 0.9rem;">{{ movie.release_date[:4] }}</p>
+          <form method="post">
+            <input type="hidden" name="id" value="{{ movie.id }}">
+            <button type="submit" class="btn btn-sm btn-primary">Add</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="collapse" id="moreResults">
+    <div class="row g-3 row-cols-2 row-cols-lg-4"">
+      {% for movie in results[4:] %}
+      <div class="col">
+        <div class="card flex-row" style="max-width: 800px; width: 100%;">
+          <img src="https://image.tmdb.org/t/p/w200/{{ movie.poster_path }}"
+               class="card-img-left"
+               alt="Poster for {{ movie.title }}"
+               style="width: 100px; height: 150px; object-fit: cover;"
+               onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/50x75.png') }}'">
+          <div class="card-body">
+            <h6 class="card-title mb-1">{{ movie.title }}</h6>
+            <p class="card-text text-muted mb-2" style="font-size: 0.9rem;">{{ movie.release_date[:4] }}</p>
+            <form method="post">
+              <input type="hidden" name="id" value="{{ movie.id }}">
+              <button type="submit" class="btn btn-sm btn-primary">Add</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Show More Button -->
+  <div class="d-flex justify-content-center mt-3 mb-3">
+    <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#moreResults" aria-expanded="false" aria-controls="moreResults">
+      Show More
+    </button>
+  </div>
+{% endif %}
+
+  {% if watched_movies %}
+  <h3 class="d-flex justify-content-center mb-3">Your watched movies</h3>
+  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for movie in watched_movies %}
+    <div class="col">
+      <div class="card">
+        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">{{ movie.get('title') }}</h5>
+          <p class="card-text text-muted">
+            {{ movie.get('release_date').year }} <br>
+            {{ movie.get('directors') }}
+          </p>
+        </div>
+        <div class="card-footer text-end">
+          <form action="{{ url_for('remove_movie') }}" method="post">
+          <input type="hidden" name="movie_id" value="{{ movie.get('movie_id') }}">
+          <input type="hidden" name="user_id" value="{{ session['id'] }}">
+          <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#{{ movie.get('movie_id') }}">
+              Info
+            </button>
+            <input class="btn btn-outline-danger" type="submit" value="Delete">
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal modal-xl fade modal-dialog-scrollable" id="{{ movie.get('movie_id') }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content d-flex flex-row">
+        <!-- Left Side: Poster -->
+        <div class="col-5 p-0">
+          <img src="https://image.tmdb.org/t/p/original{{ movie.poster_path }}" alt="Movie Poster"
+               class="w-100"
+               style="height: 100%; width: 100%; object-fit: cover;">
+        </div>
+        <!-- Right Side: Details -->
+        <div class="col-7 p-4">
+          <div class="modal-header">
+            <h5 class="modal-title" id="movieModalLabel">{{ movie.get('title') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body d-flex flex-column justify-content-between">
+            <!-- Movie Details -->
+            <p><strong>Overview:</strong> {{ movie.get('overview') }}</p>
+            <p><strong>Directors:</strong> {{ movie.get('directors') }}</p>
+            <p><strong>Release Date:</strong> {{ movie.get('release_date') }}</p>
+            <p><strong>Genres:</strong> {{ movie.get('genres') }}</p>
+            <!-- Buttons at the Bottom -->
+            <div class="modal-footer">
+              <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                <a class="btn btn-outline-dark" href="https://www.themoviedb.org/movie/{{ movie.get('movie_id') }}" target="_blank">
+                  Go to TMDB
+                </a>
+                <form action="{{ url_for('remove_movie') }}" method="post">
+                  <input type="hidden" name="movie_id" value="{{ movie.get('movie_id') }}">
+                  <input type="hidden" name="user_id" value="{{ session['id'] }}">
+                  <input class="btn btn-outline-danger" type="submit" value="Delete">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <h4>Your watched movies will be here</h4>
+  {% endif %}
+{% endblock %}
