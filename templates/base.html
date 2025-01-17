@@ -5,6 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="{{ url_for('static', filename='bootstrap.css') }}" rel="stylesheet">
   <title>{% block title %}Movie tracker{% endblock %}</title>
+  <style>
+    .btn-primary {
+      --bs-btn-color: #fff;
+      --bs-btn-bg: #809D3C;
+      --bs-btn-border-color: #809D3C;
+      --bs-btn-hover-color: #fff;
+      --bs-btn-hover-bg: #5D8736;
+      --bs-btn-hover-border-color: #577e33;
+      --bs-btn-focus-shadow-rgb: 49, 132, 253;
+      --bs-btn-active-color: #fff;
+      --bs-btn-active-bg: #5D8736;
+      --bs-btn-active-border-color: #5D8736;
+      --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+      --bs-btn-disabled-color: #fff;
+      --bs-btn-disabled-bg: #809D3C;
+      --bs-btn-disabled-border-color: #809D3C;
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar sticky-top navbar-expand-lg" data-bs-theme="dark" style="background-color: #5D8736;">

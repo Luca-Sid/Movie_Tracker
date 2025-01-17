@@ -22,7 +22,7 @@
              class="card-img-left"
              alt="Poster for {{ movie.title }}"
              style="width: 100px; height: 150px; object-fit: cover;"
-             onerror="this.onerror=null; this.src='{{ url_for('static', filename='N-A_50x75.png') }}'">
+             onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/100x150.png') }}'">
         <div class="card-body">
           <h6 class="card-title mb-1">{{ movie.title }}</h6>
           <p class="card-text text-muted mb-2" style="font-size: 0.9rem;">{{ movie.release_date[:4] }}</p>
@@ -45,7 +45,7 @@
                class="card-img-left"
                alt="Poster for {{ movie.title }}"
                style="width: 100px; height: 150px; object-fit: cover;"
-               onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/50x75.png') }}'">
+               onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/100x150.png') }}'">
           <div class="card-body">
             <h6 class="card-title mb-1">{{ movie.title }}</h6>
             <p class="card-text text-muted mb-2" style="font-size: 0.9rem;">{{ movie.release_date[:4] }}</p>
@@ -74,7 +74,9 @@
     {% for movie in watched_movies %}
     <div class="col">
       <div class="card">
-        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" class="card-img-top" alt="...">
+        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}"
+             class="card-img-top" alt="Poster for {{ movie.get('title') }}"
+             onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/433x650.png') }}'">
         <div class="card-body">
           <h5 class="card-title">{{ movie.get('title') }}</h5>
           <p class="card-text text-muted">
@@ -102,9 +104,10 @@
         <div class="modal-content d-flex flex-row">
         <!-- Left Side: Poster -->
         <div class="col-5 p-0">
-          <img src="https://image.tmdb.org/t/p/original{{ movie.poster_path }}" alt="Movie Poster"
+          <img src="https://image.tmdb.org/t/p/original{{ movie.poster_path }}" alt="Poster for {{ movie.get('title') }}"
                class="w-100"
-               style="height: 100%; width: 100%; object-fit: cover;">
+               style="height: 100%; width: 100%; object-fit: cover;"
+               onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/433x650.png') }}'">
         </div>
         <!-- Right Side: Details -->
         <div class="col-7 p-4">
