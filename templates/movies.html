@@ -2,6 +2,23 @@
 
 {% block title %}Movies{% endblock %}
 
+{% block style %}
+.card {
+      width: 100%; /* Ensure the card takes full width */
+    }
+
+.search-title {
+    max-height: 4.5em; /* Adjust based on line-height */
+    line-height: 1.5em; /* Set consistent line height */
+    overflow: hidden; /* Hide overflowing content */
+    display: -webkit-box; /* Required for truncation */
+    -webkit-line-clamp: 2; /* Limit text to 3 lines */
+    -webkit-box-orient: vertical; /* Maintain vertical flow */
+    width: 100%; /* Ensure text respects the parent container's width */
+    box-sizing: border-box; /* Include padding in width calculations */
+  }
+{% endblock %}
+
 {% block content %}
 <h3 class="d-flex justify-content-center mb-3">Add a new movie</h3>
 <form method="post" class="d-flex justify-content-center mb-3">
@@ -14,9 +31,9 @@
 
 {% if results %}
   <!-- First 3 Results as Small Horizontal Cards -->
-  <div class="row g-3 mb-3 row-cols-2 row-cols-lg-4">
+  <div class="row g-3 mb-3 row-cols-2 row-cols-lg-4 justify-content-center">
     {% for movie in results[:4] %}
-    <div class="col">
+    <div class="col col-md-5">
       <div class="card flex-row">
         <img src="https://image.tmdb.org/t/p/w200/{{ movie.poster_path }}"
              class="card-img-left"
@@ -24,7 +41,7 @@
              style="width: 100px; height: 150px; object-fit: cover;"
              onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/100x150.png') }}'">
         <div class="card-body">
-          <h6 class="card-title mb-1">{{ movie.title }}</h6>
+          <h6 class="card-title mb-1 search-title" data-bs-toggle="tooltip" data-bs-title="{{ movie.title }}">{{ movie.title }}</h6>
           <p class="card-text text-muted mb-2" style="font-size: 0.9rem;">{{ movie.release_date[:4] }}</p>
           <form method="post">
             <input type="hidden" name="id" value="{{ movie.id }}">
@@ -37,17 +54,17 @@
   </div>
 
   <div class="collapse" id="moreResults">
-    <div class="row g-3 row-cols-2 row-cols-lg-4"">
+    <div class="row g-3 mb-3 row-cols-2 row-cols-lg-4 justify-content-center">
       {% for movie in results[4:] %}
-      <div class="col">
-        <div class="card flex-row" style="max-width: 800px; width: 100%;">
+      <div class="col col-md-5 d-flex" style="max-height: 150px;">
+        <div class="card flex-row">
           <img src="https://image.tmdb.org/t/p/w200/{{ movie.poster_path }}"
                class="card-img-left"
                alt="Poster for {{ movie.title }}"
                style="width: 100px; height: 150px; object-fit: cover;"
                onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/100x150.png') }}'">
           <div class="card-body">
-            <h6 class="card-title mb-1">{{ movie.title }}</h6>
+            <h6 class="card-title mb-1 search-title" data-bs-toggle="tooltip" data-bs-title="{{ movie.title }}">{{ movie.title }}</h6>
             <p class="card-text text-muted mb-2" style="font-size: 0.9rem;">{{ movie.release_date[:4] }}</p>
             <form method="post">
               <input type="hidden" name="id" value="{{ movie.id }}">
@@ -62,7 +79,7 @@
 
   <!-- Show More Button -->
   <div class="d-flex justify-content-center mt-3 mb-3">
-    <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#moreResults" aria-expanded="false" aria-controls="moreResults">
+    <button id="toggleButton"  class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#moreResults" aria-expanded="false" aria-controls="moreResults">
       Show More
     </button>
   </div>
@@ -72,7 +89,7 @@
   <h3 class="d-flex justify-content-center mb-3">Your watched movies</h3>
   <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
     {% for movie in watched_movies %}
-    <div class="col">
+    <div class="col d-flex">
       <div class="card">
         <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}"
              class="card-img-top" alt="Poster for {{ movie.get('title') }}"
@@ -144,4 +161,30 @@
   {% else %}
   <h4>Your watched movies will be here</h4>
   {% endif %}
+
+<!--Enable bootstrap tooltip-->
+<script>
+  // Initialize Bootstrap tooltips
+  document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const button = document.getElementById('toggleButton');
+    const collapseElement = document.getElementById('moreResults');
+
+    collapseElement.addEventListener('shown.bs.collapse', function () {
+      button.textContent = 'Show Less';
+    });
+
+    collapseElement.addEventListener('hidden.bs.collapse', function () {
+      button.textContent = 'Show More';
+    });
+  });
+</script>
 {% endblock %}

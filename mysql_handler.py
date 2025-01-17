@@ -24,6 +24,7 @@ def initialize_db():
                 "id int NOT NULL AUTO_INCREMENT,"
                 "user_id int NOT NULL,"
                 "movie_id int NOT NULL,"
+                "date_added timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
                 "PRIMARY KEY (id),"
                 "FOREIGN KEY (user_id) REFERENCES users(user_id),"
                 "FOREIGN KEY (movie_id) REFERENCES movies(movie_id),"
@@ -62,7 +63,8 @@ def get_watched_movies(user_id):
     cur.execute(f"SELECT movies.* "
                 f"FROM watched_movies INNER JOIN movies "
                 f"ON watched_movies.movie_id = movies.movie_id "
-                f"WHERE user_id=%s;", (user_id,))
+                f"WHERE user_id=%s "
+                f"ORDER BY watched_movies.date_added DESC;", (user_id,))
     keys = ("movie_id","title","overview","directors","release_date","poster_path","genres")
     return [dict(zip(keys,record)) for record in cur.fetchall()]
 
