@@ -21,8 +21,7 @@ def movies():
             if request.form.get('search'):
                 searched_text = request.form['search']
                 results = search_movie(searched_text)
-                if results:
-                    return render_template('movies.html', results=results,
+                return render_template('movies.html',search=True, results=results,
                                            searched_text=searched_text, watched_movies=db.get_watched_movies(session['id']))
             # elif Add button is pressed
             elif request.form.get('id'):

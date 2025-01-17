@@ -1,5 +1,6 @@
 KEYS.py
-#test.py
+test.py
+#note.md
 .idea/
 __pycache__/
 Thumbs.db

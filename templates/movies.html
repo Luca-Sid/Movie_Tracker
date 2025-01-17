@@ -21,42 +21,19 @@
 
 {% block content %}
 <h3 class="d-flex justify-content-center mb-3">Add a new movie</h3>
-<form method="post" class="d-flex justify-content-center mb-3">
+<form method="post" class="d-flex justify-content-center ">
   <div class="input-group mb-3" style="max-width: 500px; width: 100%;">
-    <input type="text" class="form-control" placeholder="Title" value="{{ searched_text}}"
+    <input required type="text" class="form-control" placeholder="Title" value="{{ searched_text}}"
            name="search" aria-describedby="button-addon2">
     <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
   </div>
 </form>
-
-{% if results %}
-  <!-- First 3 Results as Small Horizontal Cards -->
-  <div class="row g-3 mb-3 row-cols-2 row-cols-lg-4 justify-content-center">
-    {% for movie in results[:4] %}
-    <div class="col col-md-5">
-      <div class="card flex-row">
-        <img src="https://image.tmdb.org/t/p/w200/{{ movie.poster_path }}"
-             class="card-img-left"
-             alt="Poster for {{ movie.title }}"
-             style="width: 100px; height: 150px; object-fit: cover;"
-             onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/100x150.png') }}'">
-        <div class="card-body">
-          <h6 class="card-title mb-1 search-title" data-bs-toggle="tooltip" data-bs-title="{{ movie.title }}">{{ movie.title }}</h6>
-          <p class="card-text text-muted mb-2" style="font-size: 0.9rem;">{{ movie.release_date[:4] }}</p>
-          <form method="post">
-            <input type="hidden" name="id" value="{{ movie.id }}">
-            <button type="submit" class="btn btn-sm btn-primary">Add</button>
-          </form>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-
-  <div class="collapse" id="moreResults">
-    <div class="row g-3 mb-3 row-cols-2 row-cols-lg-4 justify-content-center">
-      {% for movie in results[4:] %}
-      <div class="col col-md-5 d-flex" style="max-height: 150px;">
+{% if search %}
+  {% if results %}
+    <!-- First 3 Results as Small Horizontal Cards -->
+    <div class="row g-3 mt-1 mb-3 row-cols-2 row-cols-lg-4 justify-content-center">
+      {% for movie in results[:4] %}
+      <div class="col col-md-5">
         <div class="card flex-row">
           <img src="https://image.tmdb.org/t/p/w200/{{ movie.poster_path }}"
                class="card-img-left"
@@ -75,14 +52,44 @@
       </div>
       {% endfor %}
     </div>
-  </div>
 
-  <!-- Show More Button -->
-  <div class="d-flex justify-content-center mt-3 mb-3">
-    <button id="toggleButton"  class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#moreResults" aria-expanded="false" aria-controls="moreResults">
-      Show More
-    </button>
-  </div>
+    <div class="collapse" id="moreResults">
+      <div class="row g-3 mb-3 row-cols-2 row-cols-lg-4 justify-content-center">
+        {% for movie in results[4:] %}
+        <div class="col col-md-5 d-flex" style="max-height: 150px;">
+          <div class="card flex-row">
+            <img src="https://image.tmdb.org/t/p/w200/{{ movie.poster_path }}"
+                 class="card-img-left"
+                 alt="Poster for {{ movie.title }}"
+                 style="width: 100px; height: 150px; object-fit: cover;"
+                 onerror="this.onerror=null; this.src='{{ url_for('static', filename='placeholder/100x150.png') }}'">
+            <div class="card-body">
+              <h6 class="card-title mb-1 search-title" data-bs-toggle="tooltip" data-bs-title="{{ movie.title }}">{{ movie.title }}</h6>
+              <p class="card-text text-muted mb-2" style="font-size: 0.9rem;">{{ movie.release_date[:4] }}</p>
+              <form method="post">
+                <input type="hidden" name="id" value="{{ movie.id }}">
+                <button type="submit" class="btn btn-sm btn-primary">Add</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Show More Button -->
+    <div class="d-flex justify-content-center mt-3 mb-3">
+      <button id="toggleButton"  class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#moreResults" aria-expanded="false" aria-controls="moreResults">
+        Show More
+      </button>
+    </div>
+  {% else %}
+    <div class="d-flex justify-content-center mb-3">
+      <div class="alert alert-light text-center" role="alert"  style="max-width: 500px; width: 100%; background-color: #c4e27c;">
+        No results found.
+      </div>
+    </div>
+  {% endif %}
 {% endif %}
 
   {% if watched_movies %}
