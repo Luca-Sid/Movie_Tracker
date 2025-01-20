@@ -50,6 +50,11 @@
           <li class="nav-item">
             <a class="nav-link {% if request.path == '/movies' %}active{% endif %}" href="{{ url_for('movies') }}">Movies</a>
           </li>
+          {% if session.get('username', '').lower() == 'admin' %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.path == '/control_panel' %}active{% endif %}" href="{{ url_for('control_panel') }}">Control panel</a>
+          </li>
+          {% endif %}
         </ul>
         <div class="d-flex">
           {% if session.get('username') %}

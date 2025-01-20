@@ -71,5 +71,13 @@ def logout():
     session.pop('id')
     return redirect(url_for('index'))
 
+@app.route('/control_panel')
+def control_panel():
+    if session.get('username').lower() == 'admin':
+        return render_template('control_panel.html', users=db.get_all_users())
+    else:
+        return redirect(url_for('index'))
+
+
 if __name__ == '__main__':
     app.run(debug=True)

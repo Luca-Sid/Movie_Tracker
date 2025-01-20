@@ -1,5 +1,5 @@
 from hashlib import md5
-from mysql_handler import cur
+from mysql_handler import cur, con
 
 def is_valid(user, tried_password) -> bool:
     """Restituisce True se l'utente è in elenco e se la password corrisponde"""
@@ -10,6 +10,7 @@ def get_password(username):
     # cur.execute(f"select password_hash from users where username='{username}';")
     result = cur.fetchone()
     if result:
+        print(result[0])
         return result[0]
     else:
         return None

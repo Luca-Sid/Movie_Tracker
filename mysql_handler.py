@@ -6,7 +6,7 @@ def initialize_db():
     cur.execute("USE movie_tracker;")
     cur.execute("CREATE TABLE IF NOT EXISTS users("
                 "user_id int NOT NULL AUTO_INCREMENT,"
-                "username varchar(255) NOT NULL,"
+                "username varchar(255) NOT NULL UNIQUE,"
                 "password_hash varchar(255) NOT NULL,"
                 "PRIMARY KEY (user_id)"
                 ");")
@@ -40,11 +40,11 @@ def add_movie(movie_info):
               movie_info.get('poster_path'),
               ', '.join(movie_info.get('genres')))
     cur.execute("INSERT IGNORE INTO movies VALUES(%s, %s, %s, %s, %s, %s, %s)", values)
-    connection.commit()
+    con.commit()
 
 def add_watched_movie(user_id, movie_id):
     cur.execute("INSERT IGNORE INTO watched_movies (user_id, movie_id) VALUES(%s, %s)", (user_id, movie_id))
-    connection.commit()
+    con.commit()
 
 def remove_watched_movie(user_id, movie_id):
     cur.execute(f"DELETE FROM watched_movies WHERE movie_id=%s AND user_id=%s;", (movie_id, user_id))
@@ -53,7 +53,7 @@ def remove_watched_movie(user_id, movie_id):
         cur.execute(f"DELETE FROM movies WHERE movie_id=%s;", (movie_id,))
     except mysql.connector.errors.IntegrityError as e:
         print(f"Movie record can't be deleted: {e}")
-    connection.commit()
+    con.commit()
 
 def get_user_id(username):
     cur.execute(f"select user_id from users where username=%s;", (username,))
@@ -68,10 +68,15 @@ def get_watched_movies(user_id):
     keys = ("movie_id","title","overview","directors","release_date","poster_path","genres")
     return [dict(zip(keys,record)) for record in cur.fetchall()]
 
-connection = mysql.connector.connect(
+def get_all_users():
+    cur.execute(f"Select user_id, username from users;")
+    users = cur.fetchall()
+    return sorted(users, key=lambda x: x[0])
+
+con = mysql.connector.connect(
     host=DB_HOST,
     user=DB_USER,
     password=DB_PASSWORD
 )
-cur = connection.cursor()
+cur = con.cursor()
 initialize_db()
