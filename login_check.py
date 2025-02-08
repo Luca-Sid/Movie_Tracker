@@ -7,10 +7,8 @@ def is_valid(user, tried_password) -> bool:
 
 def get_password(username):
     cur.execute(f"select password_hash from users where username= %s ;", (username,))
-    # cur.execute(f"select password_hash from users where username='{username}';")
     result = cur.fetchone()
     if result:
-        print(result[0])
         return result[0]
     else:
         return None
