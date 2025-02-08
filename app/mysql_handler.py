@@ -1,35 +1,5 @@
 import mysql.connector
-from KEYS import DB_HOST, DB_USER, DB_PASSWORD
-
-def initialize_db():
-    cur.execute(f'CREATE DATABASE IF NOT EXISTS movie_tracker;')
-    cur.execute("USE movie_tracker;")
-    cur.execute("CREATE TABLE IF NOT EXISTS users("
-                "user_id int NOT NULL AUTO_INCREMENT,"
-                "username varchar(255) NOT NULL UNIQUE,"
-                "password_hash varchar(255) NOT NULL,"
-                "PRIMARY KEY (user_id)"
-                ");")
-    cur.execute("create table IF NOT EXISTS movies("
-                "movie_id int NOT NULL,"
-                "title varchar(255),"
-                "overview text,"
-                "director varchar(255),"
-                "release_date date,"
-                "poster_path varchar(255),"
-                "genres varchar(255),"
-                "PRIMARY KEY (movie_id)"
-                ");")
-    cur.execute("CREATE TABLE IF NOT EXISTS watched_movies ("
-                "id int NOT NULL AUTO_INCREMENT,"
-                "user_id int NOT NULL,"
-                "movie_id int NOT NULL,"
-                "date_added timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                "PRIMARY KEY (id),"
-                "FOREIGN KEY (user_id) REFERENCES users(user_id),"
-                "FOREIGN KEY (movie_id) REFERENCES movies(movie_id),"
-                "CONSTRAINT uc_user_movie UNIQUE (user_id, movie_id)"
-                ");")
+from KEYS import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
 
 def add_movie(movie_info):
     values = (movie_info.get('movie_id'),
@@ -79,4 +49,4 @@ con = mysql.connector.connect(
     password=DB_PASSWORD
 )
 cur = con.cursor()
-initialize_db()
+cur.execute(f"USE {DB_NAME};")
