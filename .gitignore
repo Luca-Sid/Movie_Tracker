@@ -4,3 +4,4 @@ app/test.py
 __pycache__/
 db/backup
 Thumbs.db
+note.md

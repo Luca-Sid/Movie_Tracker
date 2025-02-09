@@ -43,6 +43,7 @@ def get_all_users():
     users = cur.fetchall()
     return sorted(users, key=lambda x: x[0])
 
+# INITIALIZATION
 con = mysql.connector.connect(
     host=DB_HOST,
     user=DB_USER,
