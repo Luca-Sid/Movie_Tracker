@@ -5,3 +5,4 @@ __pycache__/
 db/backup
 Thumbs.db
 note.md
+container/

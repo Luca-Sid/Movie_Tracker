@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--CSS - Bootstrap and Font-Awesome -->
   <link href="{{ url_for('static', filename='bootstrap.css') }}" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
   <title>{% block title %}Movie tracker{% endblock %}</title>
+
   <style>
     .btn-primary {
       --bs-btn-color: #fff;
@@ -30,6 +35,15 @@
       box-shadow: 0 0 0 0.25rem #adca5e79;
     }
 
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
     {% block style %}
     {% endblock %}
 
@@ -49,6 +63,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link {% if request.path == '/movies' %}active{% endif %}" href="{{ url_for('movies') }}">Movies</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.path == '/discover' %}active{% endif %}" href="{{ url_for('discover') }}">Discover</a>
           </li>
           {% if session.get('username', '').lower() == 'admin' %}
           <li class="nav-item">

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Discover{% endblock %}
+
+{% block content %}
+
+You need to add at least 3 movies to your collection to get a reccomendation<br>
+<a href="{{ url_for('movies') }}">Go add movies!</a>
+
+{% endblock %}

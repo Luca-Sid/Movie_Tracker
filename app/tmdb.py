@@ -57,3 +57,27 @@ def get_movie_details(movie_id):
         print(f"Error while getting movie info:\n{e}")
         return None
 
+def get_similar_movies(movie_id, max_pages=1):
+    """
+    Fetch 'similar' movies for a given movie_id from TMDB.
+    By default, it fetches only the first page of results.
+    """
+    similar_movies = []
+    for page in range(1, max_pages + 1):
+        url = f"{BASE_URL}/movie/{movie_id}/similar"
+        params = {
+            "api_key": API_KEY,
+            "language": "en-US",
+            "page": page
+        }
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            results = data.get("results", [])
+            similar_movies.extend(results)
+        else:
+            # Break out if TMDB returns a bad status
+            print(f"Error fetching similar movies for {movie_id}: {response.text}")
+            break
+
+    return similar_movies

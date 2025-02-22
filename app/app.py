@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, url_for, redirect, session
+from flask import Flask, render_template, request, url_for, redirect, session, jsonify
+
 from tmdb import search_movie, get_movie_details
 import login_check
 import mysql_handler as db
+from recommendations import recommend
 
 
 app = Flask(__name__)
@@ -78,6 +80,19 @@ def control_panel():
     else:
         return redirect(url_for('index'))
 
+@app.route('/discover')
+def discover():
+    if db.number_of_movies(session.get('id')) >= 3:
+        return render_template('discover.html')
+    else:
+        return render_template('discover_not_enough.html')
+
+@app.route('/api/recommendations')
+def api_recommendations():
+    if session.get('id'):
+        recommendations = recommend(session.get('id'))
+        suggested_movies = [get_movie_details(movie.get('movie_id')) for movie in recommendations[:3]]
+        return jsonify(suggested_movies)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

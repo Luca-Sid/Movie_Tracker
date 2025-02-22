@@ -1,5 +1,5 @@
 import mysql.connector
-from KEYS import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
+from KEYS import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
 
 def add_movie(movie_info):
     values = (movie_info.get('movie_id'),
@@ -39,13 +39,21 @@ def get_watched_movies(user_id):
     return [dict(zip(keys,record)) for record in cur.fetchall()]
 
 def get_all_users():
-    cur.execute(f"Select user_id, username from users;")
+    cur.execute("Select user_id, username from users;")
     users = cur.fetchall()
     return sorted(users, key=lambda x: x[0])
+
+def number_of_movies(user_id):
+    """
+    Returns the number of movies watched by a specified user
+    """
+    cur.execute("select count(id) from watched_movies where user_id=%s;", (user_id,))
+    return cur.fetchone()[0]
 
 # INITIALIZATION
 con = mysql.connector.connect(
     host=DB_HOST,
+    port=DB_PORT,
     user=DB_USER,
     password=DB_PASSWORD
 )
