@@ -1,8 +1,6 @@
-app/test.py
-#note.md
+flask-app/test.py
 .idea/
 __pycache__/
-db/backup
+zz_db-backup/
 Thumbs.db
-note.md
-container/
+dev.env

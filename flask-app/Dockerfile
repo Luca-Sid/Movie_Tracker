@@ -11,3 +11,4 @@ ENV DB_NAME='movie_tracker'
 ENV DB_PORT=3306
 
 CMD ["gunicorn", "-b 0.0.0.0:80", "app:app"]
+# CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

@@ -2,6 +2,17 @@
 
 {% block title %}Discover{% endblock %}
 
+{% block style %}
+  /* For small viewports, prevent the button from stretching and align it left */
+  @media (max-width: 767.98px) {
+    #tmdb-button {
+      align-self: flex-start; /* Ensure it doesn't stretch */
+      width: auto;            /* Use its intrinsic width */
+    }
+  }
+
+{% endblock %}
+
 {% block content %}
 <h3 class="d-flex justify-content-center mb-3">Discover new movies</h3>
 
@@ -40,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (!movie) return;
 
                 container.innerHTML = `
-                    <div class="col-md-8 col-lg-6">
+                    <div class="col-md-8 col-xl-6">
                         <div class="card flex-row shadow-lg p-3 rounded" style="min-height: 300px;">
                             <img src="https://image.tmdb.org/t/p/w300/${movie.poster_path}"
                                  class="card-img-left"
@@ -53,12 +64,12 @@ document.addEventListener("DOMContentLoaded", function() {
                                 ${movie.release_date ? movie.release_date.substring(0, 4) : 'N/A'}<br>
                                 ${movie.directors}
                                 </p>
-                                <div class="mt-auto d-flex justify-content-start gap-2">
+                                <div class="mt-auto d-flex flex-column flex-sm-row  justify-content-start gap-2">
                                     <form method="post" action="{{ url_for('movies') }}">
                                         <input type="hidden" name="id" value="${movie.movie_id}">
                                         <button type="submit" class="btn btn-primary">Add</button>
                                     </form>
-                                    <a class="btn btn-outline-dark" href="https://www.themoviedb.org/movie/${movie.movie_id}" target="_blank">
+                                    <a id="tmdb-button" class="btn btn-outline-dark no-stretch" href="https://www.themoviedb.org/movie/${movie.movie_id}" target="_blank">
                                         TMDB <i class="fa fa-external-link" aria-hidden="true"></i>
                                     </a>
                                     <button id="next-btn" class="btn btn-secondary ms-auto">Next</button>

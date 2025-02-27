@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  web:
+    image: movie_tracker:latest
+    build: ./flask-app
+    container_name: flask_app
+    ports:
+      - "80:80"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: root_password
+      DB_NAME: movie_tracker
+      TMDB_API_KEY: 369b32d0f980f940d00da82ead301d92
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: movie-db:latest
+    build: ./movie-db
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
+volumes:
+  mysql_data:
