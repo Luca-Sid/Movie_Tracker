@@ -26,3 +26,4 @@ CREATE TABLE IF NOT EXISTS watched_movies (
     FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
     CONSTRAINT uc_user_movie UNIQUE (user_id, movie_id)
 );
+

@@ -3,4 +3,5 @@ flask-app/test.py
 __pycache__/
 zz_db-backup/
 Thumbs.db
+.env
 dev.env
