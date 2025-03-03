@@ -3,16 +3,240 @@
 {% block title %}Control panel{% endblock %}
 
 {% block content %}
-<table>
-  <tr>
-    <th>User ID</th>
-    <th>Username</th>
-  </tr>
-  {% for user in users %}
-  <tr>
-    <td>{{ user[0] }}</td>
-    <td>{{ user[1] }}</td>
-  </tr>
-  {% endfor %}
-</table>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      {% if category=='warning' %}
+        <div class="alert alert-warning" role="alert">
+          {{ message }}
+        </div>
+      {% elif category=='success' %}
+        <div class="alert alert-success" role="alert">
+          {{ message }}
+        </div>
+      {% elif category=='danger' %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h4 class="mt-1 mb-1">Users</h4>
+
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#NewUserModal">
+        New user
+      </button>
+
+
+    <!-- New user modal -->
+    <div class="modal fade" id="NewUserModal" tabindex="-1" aria-labelledby="NewUserModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="NewUserModalLabel">New user</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <form action="/api/add_user" method="post">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input required type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text">Needs to be unique.</div>
+              </div>
+
+              <div class="password-group">
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input required type="password"
+                         class="form-control main-password"
+                         data-confirm="confirmPassword0"
+                         id="password" name="password">
+                </div>
+
+                <div class="mb-3">
+                  <label for="confirmPassword0" class="form-label">Confirm Password</label>
+                  <input required type="password"
+                         class="form-control confirm-password"
+                         id="confirmPassword0">
+
+                  <div class="invalid-feedback password-error">
+                    Passwords do not match!
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Create User</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 text-nowrap">
+
+        <thead>
+          <tr>
+            <th scope="col" class="ps-3"># ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td class="ps-3" scope="row">{{ user.get('user_id') }}</td>
+            <td>{{ user.get('username') }}</td>
+            <td>
+              <!-- Change password button-->
+              <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#Modal_passwd_{{ user.get('user_id') }}">
+                Change password
+              </button>
+
+            {% if user.get('username')|lower != 'admin' %}
+              <!-- Delete button-->
+              <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Modal_rm_{{ user.get('user_id') }}">
+                Delete
+              </button>
+            {% endif %}
+            </td>
+          </tr>
+
+          {% if user.get('username')|lower != 'admin' %}
+          <!--  Delete Modal-->
+          <div class="modal fade" id="Modal_rm_{{ user.get('user_id') }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" >Delete confirmation</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Are you sure you want to delete {{ user.get('username') }}'s account?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <form action="/api/rm_user" method="post">
+                    <input hidden type="text" name="username" value="{{ user.get('username') }}">
+                    <input type="submit" class="btn btn-danger" value="Delete">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!--  Change password Modal-->
+          <div class="modal fade" id="Modal_passwd_{{ user.get('user_id') }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Set a new password</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/api/change_password" method="post">
+
+                  <!-- Functional hidden username input field-->
+                  <input hidden value="{{ user.get('username') }}" name="username">
+
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <label for="username" class="form-label">Username</label>
+                      <!-- Disabled non-functional input field-->
+                      <input required type="text" class="form-control" id="username" disabled readonly value="{{ user.get('username') }}">
+                    </div>
+                    <div class="password-group">
+                      <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input required type="password"
+                               class="form-control main-password"
+                               data-confirm="confirmPassword{{ user.get('user_id') }}"
+                               id="password"
+                               name="password">
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="confirmPassword{{ user.get('user_id') }}" class="form-label">Confirm Password</label>
+                        <input required type="password"
+                               class="form-control confirm-password"
+                               id="confirmPassword{{ user.get('user_id') }}">
+
+                        <div class="invalid-feedback password-error">
+                          Passwords do not match!
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <input type="submit" class="btn btn-primary" value="Confirm">
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Find all main password inputs
+  document.querySelectorAll('.main-password').forEach(mainInput => {
+
+    // 1. Find associated elements
+    const confirmId = mainInput.dataset.confirm;
+    const confirmInput = document.getElementById(confirmId);
+    const errorElement = mainInput.closest('.password-group').querySelector('.password-error');
+    const form = mainInput.closest('form');
+    const submitButton = form ? form.querySelector('[type="submit"]') : null;
+
+    // 2. Validation function
+    const validatePasswords = () => {
+      const passwordsMatch = mainInput.value === confirmInput.value;
+      const mainIsValid = mainInput.checkValidity();
+      const confirmIsValid = confirmInput.checkValidity();
+
+      // Toggle validation classes
+      confirmInput.classList.toggle('is-invalid', !passwordsMatch);
+      confirmInput.classList.toggle('is-valid', passwordsMatch && confirmIsValid);
+
+      // Show error message
+      errorElement.textContent = passwordsMatch ? '' : 'Passwords do not match!';
+
+      // Disable submit button if invalid
+      if(submitButton) {
+        const isValid = passwordsMatch && mainIsValid && confirmIsValid;
+        submitButton.disabled = !isValid;
+      }
+    };
+
+    // 3. Add event listeners
+    mainInput.addEventListener('input', validatePasswords);
+    confirmInput.addEventListener('input', validatePasswords);
+
+    // 4. Initial validation
+    validatePasswords();
+  });
+});
+</script>
+
 {% endblock %}

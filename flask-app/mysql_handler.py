@@ -38,11 +38,6 @@ def get_watched_movies(user_id):
     keys = ("movie_id","title","overview","directors","release_date","poster_path","genres")
     return [dict(zip(keys,record)) for record in cur.fetchall()]
 
-def get_all_users():
-    cur.execute("Select user_id, username from users;")
-    users = cur.fetchall()
-    return sorted(users, key=lambda x: x[0])
-
 def number_of_movies(user_id):
     """
     Returns the number of movies watched by a specified user

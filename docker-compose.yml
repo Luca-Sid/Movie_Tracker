@@ -12,6 +12,7 @@ services:
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       TMDB_API_KEY: ${TMDB_API_KEY}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       - db
     restart: always

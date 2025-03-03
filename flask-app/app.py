@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, url_for, redirect, session, jsonify
+from flask import Flask, render_template, request, url_for, redirect, session, jsonify, flash
 
 from tmdb import search_movie, get_movie_details
-import login_check
 import mysql_handler as db
+import users
 from recommendations import recommend
+import mysql.connector
 
 
 app = Flask(__name__)
@@ -54,7 +55,7 @@ def login():
         # Se la richiesta è POST analizziamo i dati del form
         username = request.form['username']
         pwd = request.form['password']
-        if login_check.is_valid(username, pwd):
+        if users.is_valid(username, pwd):
             # Se il login è valido salviamo l'username nel cookie e reindirizziamo alla pagina
             session['username']=username
             session['id']=db.get_user_id(username)
@@ -76,16 +77,19 @@ def logout():
 @app.route('/control_panel')
 def control_panel():
     if session.get('username').lower() == 'admin':
-        return render_template('control_panel.html', users=db.get_all_users())
+        return render_template('control_panel.html', users=users.get_all_users())
     else:
         return redirect(url_for('index'))
 
 @app.route('/discover')
 def discover():
-    if db.number_of_movies(session.get('id')) >= 3:
-        return render_template('discover.html')
+    if session.get('username'):
+        if db.number_of_movies(session.get('id')) >= 3:
+            return render_template('discover.html')
+        else:
+            return render_template('discover_not_enough.html')
     else:
-        return render_template('discover_not_enough.html')
+        return redirect(url_for('login'))
 
 @app.route('/api/recommendations')
 def api_recommendations():
@@ -93,6 +97,57 @@ def api_recommendations():
         recommendations = recommend(session.get('id'))
         suggested_movies = [get_movie_details(movie.get('movie_id')) for movie in recommendations[:3]]
         return jsonify(suggested_movies)
+
+@app.route('/api/add_user', methods=['POST'])
+def api_add_user():
+    if session.get('username') == 'admin':
+        username = request.form.get('username')
+        password  = request.form.get('password')
+        if username and password :
+            try:
+                users.add_user(username, password)
+            except mysql.connector.Error as e:
+                if e.errno == 1062:  # MySQL error code for duplicate entry
+                    flash(f'User "{username}" already exists', 'warning')
+                else:
+                    flash("Database error", 'danger')
+            return redirect(url_for('control_panel'))
+        else:
+            return render_template('error.html', error='Method not recognized')
+    else:
+        return render_template('error.html', error='Not authorized')
+
+@app.route('/api/rm_user', methods=['POST'])
+def api_rm_user():
+    if session.get('username') == 'admin':
+        username = request.form.get('username')
+        if username.lower() == 'admin':
+            flash("You can't delete the admin account", 'warning')
+            return redirect(url_for('control_panel'))
+        elif username:
+            users.remove_user(username)
+            flash(f"Successfully deleted user account {username} ", 'success')
+            return redirect(url_for('control_panel'))
+        else:
+            return render_template('error.html', error='Method not recognized')
+    else:
+        return render_template('error.html', error='Not authorized')
+
+@app.route('/api/change_password', methods=['POST'])
+def api_change_password():
+    if session.get('username') == 'admin':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if username and password:
+            users.change_password(username, password)
+            flash(f"Successfully changed password for user {username} ", 'success')
+            print('test')
+            return redirect(url_for('control_panel'))
+        else:
+            return render_template('error.html', error='Method not recognized')
+    else:
+        return render_template('error.html', error='Not authorized')
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
