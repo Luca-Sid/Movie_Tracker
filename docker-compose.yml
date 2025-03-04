@@ -20,17 +20,17 @@ services:
       DB_HOST: db
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
-      RECOMMENDATION_HOST: recommendation
+      RECOMMENDATION_HOST: discover
       TMDB_API_KEY: ${TMDB_API_KEY}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       - db
     restart: always
 
-  recommendation:
-    image: recommendation-service:latest
-    build: ./recommendation-service
-    container_name: recommendation-service
+  discover:
+    image: discover-engine:latest
+    build: ./discover-engine
+    container_name: discover-engine
     environment:
       DB_HOST: db
       DB_USER: ${MYSQL_USER}
