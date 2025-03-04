@@ -1,18 +1,41 @@
 version: '3.7'
 
 services:
+  nginx:
+    image: movie-nginx
+    build: ./nginx
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+    restart: always
+
   web:
     image: movie_tracker:latest
     build: ./flask-app
     container_name: flask-app
-#    ports:
-#      - "80:80"
+    environment:
+      DB_HOST: db
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      RECOMMENDATION_HOST: recommendation
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    depends_on:
+      - db
+    restart: always
+
+  recommendation:
+    image: recommendation-service:latest
+    build: ./recommendation-service
+    container_name: recommendation-service
     environment:
       DB_HOST: db
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       TMDB_API_KEY: ${TMDB_API_KEY}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       - db
     restart: always
@@ -28,17 +51,6 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
-    restart: always
-
-  nginx:
-    image: movie-nginx
-    build: ./nginx
-    container_name: nginx-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on:
-      - web
     restart: always
 
 

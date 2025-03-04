@@ -1,6 +1,6 @@
 FROM python:3.12-bookworm
 
-WORKDIR /movie_tracker
+WORKDIR /recommendation-service
 
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt

@@ -3,24 +3,6 @@ from KEYS import TMDB_API_KEY as API_KEY
 
 BASE_URL = 'https://api.themoviedb.org/3'
 
-def search_movie(movie_name):
-    """
-    Searches for a movie by name and returns the search results.
-    """
-    url = f"{BASE_URL}/search/movie"
-    params = {
-        'api_key': API_KEY,
-        'query': movie_name
-    }
-    response = requests.get(url, params=params)
-
-    if response.status_code == 200:
-        return response.json().get('results', [])
-    else:
-        print(f"Error: Unable to fetch data. HTTP Status Code: {response.status_code}")
-        return []
-
-
 def get_movie_details(movie_id):
     # Movie Details Endpoint
     movie_details_url = f"{BASE_URL}/movie/{movie_id}"
@@ -57,3 +39,29 @@ def get_movie_details(movie_id):
         print(f"Error while getting movie info:\n{e}")
         return None
 
+
+
+def get_similar_movies(movie_id, max_pages=1):
+    """
+    Fetch 'recommended' (similar) movies for a given movie_id from TMDB.
+    By default, it fetches only the first page of results.
+    """
+    similar_movies = []
+    for page in range(1, max_pages + 1):
+        url = f"{BASE_URL}/movie/{movie_id}/recommendations"
+        params = {
+            "api_key": API_KEY,
+            "language": "en-US",
+            "page": page
+        }
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            results = data.get("results", [])
+            similar_movies.extend(results)
+        else:
+            # Break out if TMDB returns a bad status
+            print(f"Error fetching similar movies for {movie_id}: {response.text}")
+            break
+
+    return similar_movies

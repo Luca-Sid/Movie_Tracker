@@ -1,5 +1,5 @@
 from hashlib import md5
-from mysql_handler import cur, con
+from database import cur, con
 from KEYS import ADMIN_PASSWORD
 import mysql.connector
 
@@ -53,7 +53,3 @@ if ADMIN_PASSWORD:
             print(f'Admin user  already exists')
         else:
             print("Database error:\n", e)
-
-if __name__ == '__main__':
-    print(is_valid('luca', '123'))
-    print(is_valid('alberto', '123'))

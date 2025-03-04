@@ -2,9 +2,6 @@ import os
 
 TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 
-ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
-RECOMMENDATION_HOST = os.getenv('RECOMMENDATION_HOST', default='localhost:5001')
-
 # DB information
 DB_HOST = os.getenv('DB_HOST', default='localhost')
 DB_PORT = os.getenv('DB_PORT', default='3306')

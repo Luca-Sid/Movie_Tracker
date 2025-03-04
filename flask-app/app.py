@@ -1,16 +1,15 @@
-from flask import Flask, render_template, request, url_for, redirect, session, jsonify, flash
+from flask import Flask, render_template, request, url_for, redirect, session, flash
+import requests
+from KEYS import RECOMMENDATION_HOST
 
 from tmdb import search_movie, get_movie_details
-import mysql_handler as db
+import database as db
 import users
-from recommendations import recommend
 import mysql.connector
-
 
 app = Flask(__name__)
 app.secret_key = "gPs26!eE3$R9Dfhj3$R9Df"
 
-movies_list = []
 
 @app.route('/')
 def index():
@@ -35,8 +34,10 @@ def movies():
             else:
                 return render_template('error.html', error='Method not recognized')
         else:
+            # If the method is GET show the page with only the previously added movies
             return render_template('movies.html', watched_movies=db.get_watched_movies(session['id']))
     else:
+        # If the user is not logged on
         return redirect(url_for('login'))
 
 @app.route('/remove_movie', methods=['POST'])
@@ -76,6 +77,7 @@ def logout():
 
 @app.route('/control_panel')
 def control_panel():
+    """Shows the control panel only to the admin user"""
     if session.get('username').lower() == 'admin':
         return render_template('control_panel.html', users=users.get_all_users())
     else:
@@ -83,6 +85,7 @@ def control_panel():
 
 @app.route('/discover')
 def discover():
+    """Discover page. If the user has added at least three movies it gives suggestions based on those."""
     if session.get('username'):
         if db.number_of_movies(session.get('id')) >= 3:
             return render_template('discover.html')
@@ -93,10 +96,13 @@ def discover():
 
 @app.route('/api/recommendations')
 def api_recommendations():
+    """Calls the recommendation microservice"""
     if session.get('id'):
-        recommendations = recommend(session.get('id'))
-        suggested_movies = [get_movie_details(movie.get('movie_id')) for movie in recommendations[:3]]
-        return jsonify(suggested_movies)
+        try:
+            response = requests.get(f"http://{RECOMMENDATION_HOST}/recommendation/{session.get('id')}")
+            return response.json()
+        except requests.exceptions.RequestException:
+            return []
 
 @app.route('/api/add_user', methods=['POST'])
 def api_add_user():
