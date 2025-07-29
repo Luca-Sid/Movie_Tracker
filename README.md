@@ -2,6 +2,8 @@
 
 A web app for exploring movies, saving favorites, and getting personalized recommendations.
 
+https://github.com/user-attachments/assets/31abe0cb-68ec-44fd-a658-7e78ae33fa92
+
 ## Key Features  
 - **Search & Save**: Browse movies via TMDB API and create a personal list.  
 - **Discover**: Get suggestions based on your saved movies.  
