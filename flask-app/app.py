@@ -106,7 +106,7 @@ def api_recommendations():
 
 @app.route('/api/add_user', methods=['POST'])
 def api_add_user():
-    if session.get('username') == 'admin':
+    if session.get('username').lower() == 'admin':
         username = request.form.get('username')
         password  = request.form.get('password')
         if username and password :
@@ -125,7 +125,7 @@ def api_add_user():
 
 @app.route('/api/rm_user', methods=['POST'])
 def api_rm_user():
-    if session.get('username') == 'admin':
+    if session.get('username').lower() == 'admin':
         username = request.form.get('username')
         if username.lower() == 'admin':
             flash("You can't delete the admin account", 'warning')
@@ -141,7 +141,7 @@ def api_rm_user():
 
 @app.route('/api/change_password', methods=['POST'])
 def api_change_password():
-    if session.get('username') == 'admin':
+    if session.get('username').lower() == 'admin':
         username = request.form.get('username')
         password = request.form.get('password')
         if username and password:
