@@ -78,7 +78,7 @@ def logout():
 @app.route('/control_panel')
 def control_panel():
     """Shows the control panel only to the admin user"""
-    if session.get('username').lower() == 'admin':
+    if session.get('username') and session.get('username').lower() == 'admin':
         return render_template('control_panel.html', users=users.get_all_users())
     else:
         return redirect(url_for('index'))
@@ -106,7 +106,7 @@ def api_recommendations():
 
 @app.route('/api/add_user', methods=['POST'])
 def api_add_user():
-    if session.get('username').lower() == 'admin':
+    if session.get('username') and session.get('username').lower() == 'admin':
         username = request.form.get('username')
         password  = request.form.get('password')
         if username and password :
@@ -125,13 +125,14 @@ def api_add_user():
 
 @app.route('/api/rm_user', methods=['POST'])
 def api_rm_user():
-    if session.get('username').lower() == 'admin':
+    if session.get('username') and session.get('username').lower() == 'admin':
         username = request.form.get('username')
+        user_id = request.form.get('user_id')
         if username.lower() == 'admin':
             flash("You can't delete the admin account", 'warning')
             return redirect(url_for('control_panel'))
         elif username:
-            users.remove_user(username)
+            users.remove_user(user_id)
             flash(f"Successfully deleted user account {username} ", 'success')
             return redirect(url_for('control_panel'))
         else:
@@ -141,7 +142,7 @@ def api_rm_user():
 
 @app.route('/api/change_password', methods=['POST'])
 def api_change_password():
-    if session.get('username').lower() == 'admin':
+    if session.get('username') and session.get('username').lower() == 'admin':
         username = request.form.get('username')
         password = request.form.get('password')
         if username and password:

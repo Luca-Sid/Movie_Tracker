@@ -1,5 +1,5 @@
 from hashlib import md5
-from database import cur, con
+from database import get_db
 from KEYS import ADMIN_PASSWORD
 import mysql.connector
 
@@ -8,8 +8,14 @@ def is_valid(user, tried_password) -> bool:
     return get_password(user) == hash(tried_password)
 
 def get_password(username):
-    cur.execute(f"select password_hash from users where username= %s ;", (username,))
-    result = cur.fetchone()
+    con, cur = get_db()
+    try:
+        cur.execute(f"select password_hash from users where username= %s ;", (username,))
+        result = cur.fetchone()
+    finally:
+        cur.close()
+        con.close()
+
     if result:
         return result[0]
     else:
@@ -20,28 +26,50 @@ def hash(s:str):
     return md5(s.encode()).hexdigest()
 
 def get_all_users():
-    cur.execute("Select user_id, username from users;")
-    users = cur.fetchall()
-    userlist = sorted(users, key=lambda x: x[0])
-    return  [ {'user_id':x[0], 'username':x[1]} for x in userlist]
+    con, cur = get_db()
+    try:
+        cur.execute("Select user_id, username from users;")
+        users = cur.fetchall()
+        userlist = sorted(users, key=lambda x: x[0])
+        return  [ {'user_id':x[0], 'username':x[1]} for x in userlist]
+    finally:
+        cur.close()
+        con.close()
 
 def add_user(username, password):
     """
     Adds a new user to the database
     """
-    cur.execute("insert into users (username, password_hash) values (%s, %s);", (username, hash(password)))
-    con.commit()
+    con, cur = get_db()
+    try:
+        cur.execute("insert into users (username, password_hash) values (%s, %s);", (username, hash(password)))
+        con.commit()
+    finally:
+        cur.close()
+        con.close()
 
-def remove_user(username):
+def remove_user(user_id):
     """
     Removes user from database
     """
-    cur.execute("delete from users where username=%s;", (username,))
-    con.commit()
+    con, cur = get_db()
+    try:
+        cur.execute("delete from watched_movies where user_id=%s;", (user_id,))
+        con.commit()
+        cur.execute("delete from users where user_id=%s;", (user_id,))
+        con.commit()
+    finally:
+        cur.close()
+        con.close()
 
 def change_password(username, password):
-    cur.execute("update users set password_hash=%s where username=%s;", (hash(password), username))
-    con.commit()
+    con, cur = get_db()
+    try:
+        cur.execute("update users set password_hash=%s where username=%s;", (hash(password), username))
+        con.commit()
+    finally:
+        cur.close()
+        con.close()
 
 # Initialization: create user account
 if ADMIN_PASSWORD:

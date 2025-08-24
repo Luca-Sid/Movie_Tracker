@@ -132,6 +132,7 @@
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                   <form action="/api/rm_user" method="post">
                     <input hidden type="text" name="username" value="{{ user.get('username') }}">
+                    <input hidden type="text" name="user_id" value="{{ user.get('user_id') }}">
                     <input type="submit" class="btn btn-danger" value="Delete">
                   </form>
                 </div>
